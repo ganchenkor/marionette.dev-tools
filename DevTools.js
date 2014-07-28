@@ -63,14 +63,26 @@ var _subViews = function(obj) {
 
 
 var radioInspector = function() {
-    return _.object(_.map(Radio._channels, function(channel, channelName) {
-        return [channelName, {
-            vent: channel.vent._events,
-            reqres: channel.reqres._wreqrHandlers,
-            commands: channel.commands._wreqrHandlers,
-            channel: channel
-        }];
-    }));
+  return _.object(_.map(Radio._channels, function(channel, channelName) {
+    var vent, reqres, commands;
+
+    if (channel.vent) {
+      vent = channel.vent._events;
+      reqres = channel.reqres._wreqrHandlers;
+      commands = channel.commands._wreqrHandlers;
+    } else {
+      vent = channel._events;
+      reqres = channel._requests;
+      commands = channel._commands;
+    }
+
+    return [channelName, {
+      vent: vent,
+      reqres: reqres,
+      commands: commands,
+      channel: channel
+    }];
+  }));
 };
 
 var breakOn = function(object, method) {
@@ -82,7 +94,7 @@ var breakOn = function(object, method) {
     object[method] = function stopExecution() {
         debugger;
         return originalMethod.apply(this, arguments);
-    }
+    };
 
     return object[method];
 };
